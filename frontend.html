@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>faast — Download Manager</title>
+  <style>
+    :root {
+      --bg: #f5f6f8;
+      --surface: #ffffff;
+      --surface-alt: #f9fafb;
+      --border: #e4e7ec;
+      --text: #1a1d23;
+      --text-muted: #6b7280;
+      --text-subtle: #9ca3af;
+      --accent: #2563eb;
+      --accent-soft: #eff6ff;
+      --green: #16a34a;
+      --green-soft: #f0fdf4;
+      --amber: #d97706;
+      --amber-soft: #fffbeb;
+      --red: #dc2626;
+      --red-soft: #fef2f2;
+      --radius: 10px;
+      --radius-sm: 7px;
+      --shadow: 0 8px 30px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font);
+      background: #dfe3e8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 32px;
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Desktop window shell ── */
+    .window {
+      width: 1180px;
+      max-width: 100%;
+      height: 740px;
+      max-height: 92vh;
+      background: var(--surface);
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+    }
+
+    /* ── Title bar ── */
+    .titlebar {
+      height: 42px;
+      min-height: 42px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      gap: 16px;
+      user-select: none;
+    }
+
+    .traffic-lights {
+      display: flex;
+      gap: 7px;
+      align-items: center;
+    }
+
+    .traffic-lights span {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .traffic-lights .close { background: #ff5f57; }
+    .traffic-lights .min { background: #febc2e; }
+    .traffic-lights .max { background: #28c840; }
+
+    .app-brand {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: var(--text);
+    }
+
+    .app-brand span {
+      color: var(--accent);
+    }
+
+    .titlebar-spacer {
+      flex: 1;
+    }
+
+    .titlebar-meta {
+      font-size: 11px;
+      color: var(--text-subtle);
+      font-weight: 500;
+    }
+
+    /* ── Main layout ── */
+    .shell {
+      display: flex;
+      flex: 1;
+      min-height: 0;
+    }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      width: 220px;
+      min-width: 220px;
+      background: var(--surface-alt);
+      border-right: 1px solid var(--border);
+      padding: 18px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+      overflow-y: auto;
+    }
+
+    .sidebar-section-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-subtle);
+      padding: 0 10px;
+      margin-bottom: 6px;
+    }
+
+    .nav-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 7px 10px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: background 0.12s, color 0.12s;
+      border: none;
+      background: transparent;
+      width: 100%;
+      text-align: left;
+    }
+
+    .nav-item:hover {
+      background: rgba(0, 0, 0, 0.04);
+      color: var(--text);
+    }
+
+    .nav-item.active {
+      background: var(--surface);
+      color: var(--accent);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+      font-weight: 600;
+    }
+
+    .nav-item .ico {
+      width: 16px;
+      height: 16px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      opacity: 0.7;
+    }
+
+    .nav-item.active .ico {
+      opacity: 1;
+    }
+
+    .nav-badge {
+      margin-left: auto;
+      font-size: 10px;
+      font-weight: 600;
+      background: var(--border);
+      color: var(--text-muted);
+      padding: 1px 6px;
+      border-radius: 999px;
+      line-height: 1.4;
+    }
+
+    .nav-item.active .nav-badge {
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+
+    /* ── Main panel ── */
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      background: var(--surface);
+    }
+
+    /* ── Toolbar ── */
+    .toolbar {
+      height: 54px;
+      min-height: 54px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      gap: 10px;
+      background: var(--surface);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      height: 32px;
+      padding: 0 12px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: var(--surface);
+      font-family: inherit;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text);
+      cursor: pointer;
+      transition: background 0.12s, border-color 0.12s;
+      white-space: nowrap;
+    }
+
+    .btn:hover {
+      background: var(--surface-alt);
+      border-color: #d1d5db;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: #1d4ed8;
+      border-color: #1d4ed8;
+    }
+
+    .btn-ghost {
+      border-color: transparent;
+      background: transparent;
+    }
+
+    .btn-ghost:hover {
+      background: var(--surface-alt);
+    }
+
+    .btn:disabled {
+      opacity: 0.45;
+      cursor: default;
+    }
+
+    .toolbar-divider {
+      width: 1px;
+      height: 20px;
+      background: var(--border);
+      margin: 0 4px;
+    }
+
+    .search-wrap {
+      margin-left: auto;
+      position: relative;
+      width: 220px;
+    }
+
+    .search-wrap input {
+      width: 100%;
+      height: 32px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0 10px 0 30px;
+      font-family: inherit;
+      font-size: 12.5px;
+      color: var(--text);
+      background: var(--surface-alt);
+      outline: none;
+      transition: border-color 0.12s, background 0.12s;
+    }
+
+    .search-wrap input:focus {
+      border-color: var(--accent);
+      background: var(--surface);
+    }
+
+    .search-wrap .search-icon {
+      position: absolute;
+      left: 9px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-subtle);
+      pointer-events: none;
+      width: 14px;
+      height: 14px;
+    }
+
+    /* ── Download list ── */
+    .list-header {
+      display: grid;
+      grid-template-columns: 2.4fr 1fr 1.2fr 0.9fr 0.9fr 0.8fr 90px;
+      gap: 12px;
+      padding: 8px 20px;
+      font-size: 10.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-subtle);
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
+
+    .download-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 4px 0;
+    }
+
+    .download-row {
+      display: grid;
+      grid-template-columns: 2.4fr 1fr 1.2fr 0.9fr 0.9fr 0.8fr 90px;
+      gap: 12px;
+      align-items: center;
+      padding: 10px 20px;
+      border-bottom: 1px solid var(--border);
+      font-size: 12.5px;
+      transition: background 0.1s;
+    }
+
+    .download-row:hover {
+      background: var(--surface-alt);
+    }
+
+    .download-row:last-child {
+      border-bottom: none;
+    }
+
+    .file-cell {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .file-icon {
+      width: 30px;
+      height: 30px;
+      border-radius: 7px;
+      background: var(--accent-soft);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      color: var(--accent);
+    }
+
+    .file-icon.video { background: #fef3c7; color: #b45309; }
+    .file-icon.music { background: #fce7f3; color: #be185d; }
+    .file-icon.doc { background: #e0f2fe; color: #0369a1; }
+    .file-icon.app { background: #ede9fe; color: #6d28d9; }
+
+    .file-meta {
+      min-width: 0;
+    }
+
+    .file-name {
+      font-weight: 600;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.3;
+    }
+
+    .file-sub {
+      font-size: 11px;
+      color: var(--text-subtle);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 999px;
+      line-height: 1.4;
+      width: fit-content;
+    }
+
+    .status-pill .lucide {
+      width: 12px;
+      height: 12px;
+    }
+
+    .status-pill.downloading { background: var(--accent-soft); color: var(--accent); }
+    .status-pill.completed { background: var(--green-soft); color: var(--green); }
+    .status-pill.paused { background: var(--amber-soft); color: var(--amber); }
+    .status-pill.stopped { background: var(--red-soft); color: var(--red); }
+
+    .progress-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .progress-bar-bg {
+      height: 5px;
+      background: var(--border);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      border-radius: 999px;
+      background: var(--accent);
+      transition: width 0.3s ease;
+    }
+
+    .progress-bar-fill.green { background: var(--green); }
+    .progress-bar-fill.amber { background: var(--amber); }
+    .progress-bar-fill.red { background: var(--red); }
+
+    .progress-text {
+      font-size: 10.5px;
+      color: var(--text-muted);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .cell-muted {
+      color: var(--text-muted);
+      font-variant-numeric: tabular-nums;
+      font-size: 12px;
+    }
+
+    .row-actions {
+      display: flex;
+      gap: 4px;
+      justify-content: flex-end;
+    }
+
+    .icon-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.1s, color 0.1s;
+      font-family: inherit;
+    }
+
+    .icon-btn:hover {
+      background: var(--surface-alt);
+      border-color: var(--border);
+      color: var(--text);
+    }
+
+    .icon-btn.danger:hover {
+      background: var(--red-soft);
+      border-color: #fecaca;
+      color: var(--red);
+    }
+
+    .icon-btn .lucide {
+      width: 15px;
+      height: 15px;
+    }
+
+    /* ── Status bar ── */
+    .statusbar {
+      height: 34px;
+      min-height: 34px;
+      border-top: 1px solid var(--border);
+      background: var(--surface-alt);
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      gap: 20px;
+      font-size: 11.5px;
+      color: var(--text-muted);
+    }
+
+    .status-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+
+    .status-item strong {
+      color: var(--text);
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .status-spacer {
+      flex: 1;
+    }
+
+    .speed-indicator {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      color: var(--green);
+      font-weight: 600;
+    }
+
+    .speed-indicator .pulse {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+      animation: pulse 1.8s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.35; }
+    }
+
+    /* ── Lucide sizing overrides ── */
+    .ico .lucide { width: 16px; height: 16px; }
+    .file-icon .lucide { width: 18px; height: 18px; }
+    .btn .lucide { width: 14px; height: 14px; }
+    .empty-state .big .lucide { width: 32px; height: 32px; }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #d1d5db;
+      border-radius: 999px;
+      border: 2px solid transparent;
+      background-clip: content-box;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #9ca3af;
+      background-clip: content-box;
+      border: 2px solid transparent;
+    }
+
+    /* ── Empty state ── */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 20px;
+      color: var(--text-subtle);
+      gap: 8px;
+    }
+
+    .empty-state .big {
+      opacity: 0.4;
+    }
+
+    .empty-state p {
+      font-size: 13px;
+    }
+
+    /* ── Responsive tweaks ── */
+    @media (max-width: 900px) {
+      .sidebar { width: 180px; min-width: 180px; }
+      .list-header,
+      .download-row {
+        grid-template-columns: 2fr 1fr 1fr 0.8fr 0.8fr 0.7fr 76px;
+        gap: 8px;
+        padding-left: 14px;
+        padding-right: 14px;
+      }
+      .search-wrap { width: 150px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="window" role="application" aria-label="faast download manager">
+
+    <!-- Title bar -->
+    <div class="titlebar">
+      <div class="traffic-lights">
+        <span class="close"></span>
+        <span class="min"></span>
+        <span class="max"></span>
+      </div>
+      <div class="app-brand">faast<span>.</span></div>
+      <div class="titlebar-spacer"></div>
+      <div class="titlebar-meta">Open Source · v0.1.0-alpha</div>
+    </div>
+
+    <!-- Shell -->
+    <div class="shell">
+
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div>
+          <div class="sidebar-section-label">Library</div>
+          <ul class="nav-list" id="navPrimary">
+            <li>
+              <button class="nav-item active" data-filter="all">
+                <span class="ico"><i data-lucide="layout-list"></i></span> All downloads
+                <span class="nav-badge" id="countAll">6</span>
+              </button>
+            </li>
+            <li>
+              <button class="nav-item" data-filter="downloading">
+                <span class="ico"><i data-lucide="download"></i></span> Downloading
+                <span class="nav-badge" id="countDownloading">2</span>
+              </button>
+            </li>
+            <li>
+              <button class="nav-item" data-filter="completed">
+                <span class="ico"><i data-lucide="check-circle"></i></span> Completed
+                <span class="nav-badge" id="countCompleted">3</span>
+              </button>
+            </li>
+            <li>
+              <button class="nav-item" data-filter="paused">
+                <span class="ico"><i data-lucide="pause"></i></span> Paused
+                <span class="nav-badge" id="countPaused">1</span>
+              </button>
+            </li>
+            <li>
+              <button class="nav-item" data-filter="stopped">
+                <span class="ico"><i data-lucide="square"></i></span> Stopped
+                <span class="nav-badge" id="countStopped">0</span>
+              </button>
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <div class="sidebar-section-label">Categories</div>
+          <ul class="nav-list" id="navCategories">
+            <li>
+              <button class="nav-item" data-category="video">
+                <span class="ico"><i data-lucide="film"></i></span> Video
+              </button>
+            </li>
+            <li>
+              <button class="nav-item" data-category="music">
+                <span class="ico"><i data-lucide="music"></i></span> Music
+              </button>
+            </li>
+            <li>
+              <button class="nav-item" data-category="document">
+                <span class="ico"><i data-lucide="file-text"></i></span> Documents
+              </button>
+            </li>
+            <li>
+              <button class="nav-item" data-category="app">
+                <span class="ico"><i data-lucide="app-window"></i></span> Applications
+              </button>
+            </li>
+          </ul>
+        </div>
+      </aside>
+
+      <!-- Main panel -->
+      <main class="main">
+
+        <!-- Toolbar -->
+        <div class="toolbar">
+          <button class="btn btn-primary" id="btnNew">
+            <i data-lucide="plus"></i> New download
+          </button>
+          <button class="btn" id="btnPause">
+            <i data-lucide="pause"></i> Pause
+          </button>
+          <button class="btn" id="btnResume">
+            <i data-lucide="play"></i> Resume
+          </button>
+          <div class="toolbar-divider"></div>
+          <button class="btn btn-ghost" id="btnRemove">
+            <i data-lucide="trash-2"></i> Remove
+          </button>
+          <div class="search-wrap">
+            <i data-lucide="search" class="search-icon"></i>
+            <input type="text" id="searchInput" placeholder="Search downloads…" />
+          </div>
+        </div>
+
+        <!-- Column headers -->
+        <div class="list-header">
+          <div>Name</div>
+          <div>Status</div>
+          <div>Progress</div>
+          <div>Size</div>
+          <div>Speed</div>
+          <div>ETA</div>
+          <div></div>
+        </div>
+
+        <!-- Download list -->
+        <div class="download-list" id="downloadList"></div>
+
+        <!-- Status bar -->
+        <div class="statusbar">
+          <div class="status-item">
+            <span class="speed-indicator"><span class="pulse"></span> <span id="globalSpeed">4.8 MB/s</span></span>
+          </div>
+          <div class="status-item">
+            <span>Active:</span> <strong id="activeCount">2</strong>
+          </div>
+          <div class="status-item">
+            <span>Total down:</span> <strong>1.24 GB</strong>
+          </div>
+          <div class="status-spacer"></div>
+          <div class="status-item">
+            <span>Limit:</span> <strong>Unlimited</strong>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Lucide CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script>
+    // ── Demo data ──────────────────────────────────────────────
+    const downloads = [
+      {
+        id: 1,
+        name: "ubuntu-24.04-desktop-amd64.iso",
+        sub: "releases.ubuntu.com",
+        category: "app",
+        status: "downloading",
+        progress: 67,
+        size: "5.7 GB",
+        speed: "3.2 MB/s",
+        eta: "12 min",
+      },
+      {
+        id: 2,
+        name: "project-demo-final-v2.mp4",
+        sub: "cdn.example.com",
+        category: "video",
+        status: "downloading",
+        progress: 34,
+        size: "1.4 GB",
+        speed: "1.6 MB/s",
+        eta: "8 min",
+      },
+      {
+        id: 3,
+        name: "lofi-beats-collection.zip",
+        sub: "archive.org",
+        category: "music",
+        status: "completed",
+        progress: 100,
+        size: "820 MB",
+        speed: "—",
+        eta: "Done",
+      },
+      {
+        id: 4,
+        name: "annual-report-2025.pdf",
+        sub: "docs.company.com",
+        category: "document",
+        status: "completed",
+        progress: 100,
+        size: "12.4 MB",
+        speed: "—",
+        eta: "Done",
+      },
+      {
+        id: 5,
+        name: "faast-source-v0.1.0.tar.gz",
+        sub: "github.com/faast",
+        category: "app",
+        status: "completed",
+        progress: 100,
+        size: "48.2 MB",
+        speed: "—",
+        eta: "Done",
+      },
+      {
+        id: 6,
+        name: "wallpaper-pack-4k.rar",
+        sub: "media.example.net",
+        category: "video",
+        status: "paused",
+        progress: 81,
+        size: "2.1 GB",
+        speed: "0 B/s",
+        eta: "Paused",
+      },
+    ];
+
+    // ── Helpers ───────────────────────────────────────────────
+    const $list = document.getElementById("downloadList");
+    const $search = document.getElementById("searchInput");
+    let activeFilter = "all";
+    let activeCategory = null;
+
+    function statusClass(status) {
+      return status === "downloading" ? "downloading"
+        : status === "completed" ? "completed"
+        : status === "paused" ? "paused"
+        : "stopped";
+    }
+
+    function statusLabel(status) {
+      return status.charAt(0).toUpperCase() + status.slice(1);
+    }
+
+    function statusIcon(status) {
+      return {
+        downloading: "arrow-down-circle",
+        completed: "check-circle",
+        paused: "pause-circle",
+        stopped: "x-circle",
+      }[status] || "circle";
+    }
+
+    function fileIconClass(category) {
+      return { video: "video", music: "music", document: "doc", app: "app" }[category] || "";
+    }
+
+    function fileIconName(category) {
+      return {
+        video: "file-video",
+        music: "music",
+        document: "file-text",
+        app: "app-window",
+      }[category] || "file";
+    }
+
+    function progressFillClass(status) {
+      if (status === "completed") return "green";
+      if (status === "paused") return "amber";
+      if (status === "stopped") return "red";
+      return "";
+    }
+
+    // ── Render ────────────────────────────────────────────────
+    function render() {
+      const query = $search.value.trim().toLowerCase();
+      let filtered = downloads.filter((d) => {
+        if (activeFilter !== "all" && d.status !== activeFilter) return false;
+        if (activeCategory && d.category !== activeCategory) return false;
+        if (query && !d.name.toLowerCase().includes(query) && !d.sub.toLowerCase().includes(query)) return false;
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        $list.innerHTML = `
+          <div class="empty-state">
+            <div class="big"><i data-lucide="download"></i></div>
+            <p>No downloads match this view.</p>
+          </div>`;
+      } else {
+        $list.innerHTML = filtered
+          .map(
+            (d) => `
+          <div class="download-row" data-id="${d.id}">
+            <div class="file-cell">
+              <div class="file-icon ${fileIconClass(d.category)}">
+                <i data-lucide="${fileIconName(d.category)}"></i>
+              </div>
+              <div class="file-meta">
+                <div class="file-name">${d.name}</div>
+                <div class="file-sub">${d.sub}</div>
+              </div>
+            </div>
+            <div>
+              <span class="status-pill ${statusClass(d.status)}">
+                <i data-lucide="${statusIcon(d.status)}"></i> ${statusLabel(d.status)}
+              </span>
+            </div>
+            <div class="progress-wrap">
+              <div class="progress-bar-bg">
+                <div class="progress-bar-fill ${progressFillClass(d.status)}" style="width:${d.progress}%"></div>
+              </div>
+              <div class="progress-text">${d.progress}%</div>
+            </div>
+            <div class="cell-muted">${d.size}</div>
+            <div class="cell-muted">${d.speed}</div>
+            <div class="cell-muted">${d.eta}</div>
+            <div class="row-actions">
+              ${
+                d.status === "downloading"
+                  ? `<button class="icon-btn" title="Pause" onclick="toggleStatus(${d.id}, 'pause')"><i data-lucide="pause"></i></button>`
+                  : d.status === "paused"
+                  ? `<button class="icon-btn" title="Resume" onclick="toggleStatus(${d.id}, 'resume')"><i data-lucide="play"></i></button>`
+                  : d.status === "stopped"
+                  ? `<button class="icon-btn" title="Resume" onclick="toggleStatus(${d.id}, 'resume')"><i data-lucide="play"></i></button>`
+                  : ""
+              }
+              <button class="icon-btn danger" title="Remove" onclick="removeDownload(${d.id})"><i data-lucide="trash-2"></i></button>
+            </div>
+          </div>`
+          )
+          .join("");
+      }
+
+      // Update counts
+      document.getElementById("countAll").textContent = downloads.length;
+      document.getElementById("countDownloading").textContent = downloads.filter((d) => d.status === "downloading").length;
+      document.getElementById("countCompleted").textContent = downloads.filter((d) => d.status === "completed").length;
+      document.getElementById("countPaused").textContent = downloads.filter((d) => d.status === "paused").length;
+      document.getElementById("countStopped").textContent = downloads.filter((d) => d.status === "stopped").length;
+
+      const active = downloads.filter((d) => d.status === "downloading").length;
+      document.getElementById("activeCount").textContent = active;
+      document.getElementById("globalSpeed").textContent =
+        active > 0 ? "4.8 MB/s" : "0 B/s";
+
+      // Re-render Lucide icons after dynamic content update
+      if (window.lucide) {
+        lucide.createIcons();
+      }
+    }
+
+    // ── Interactions ───────────────────────────────────────────
+    function toggleStatus(id, action) {
+      const item = downloads.find((d) => d.id === id);
+      if (!item) return;
+      if (action === "pause" && item.status === "downloading") {
+        item.status = "paused";
+        item.speed = "0 B/s";
+        item.eta = "Paused";
+      } else if (action === "resume" && (item.status === "paused" || item.status === "stopped")) {
+        item.status = "downloading";
+        item.speed = (Math.random() * 3 + 0.8).toFixed(1) + " MB/s";
+        item.eta = Math.floor(Math.random() * 15 + 3) + " min";
+      }
+      render();
+    }
+
+    function removeDownload(id) {
+      const idx = downloads.findIndex((d) => d.id === id);
+      if (idx !== -1) downloads.splice(idx, 1);
+      render();
+    }
+
+    // Sidebar primary filter
+    document.querySelectorAll("#navPrimary .nav-item").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll("#navPrimary .nav-item").forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        activeFilter = btn.dataset.filter;
+        activeCategory = null;
+        document.querySelectorAll("#navCategories .nav-item").forEach((b) => b.classList.remove("active"));
+        render();
+      });
+    });
+
+    // Sidebar category filter
+    document.querySelectorAll("#navCategories .nav-item").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const cat = btn.dataset.category;
+        document.querySelectorAll("#navCategories .nav-item").forEach((b) => b.classList.remove("active"));
+        if (activeCategory === cat) {
+          activeCategory = null;
+        } else {
+          btn.classList.add("active");
+          activeCategory = cat;
+        }
+        activeFilter = "all";
+        document.querySelectorAll("#navPrimary .nav-item").forEach((b) => b.classList.remove("active"));
+        document.querySelector('#navPrimary .nav-item[data-filter="all"]').classList.add("active");
+        render();
+      });
+    });
+
+    // Search
+    $search.addEventListener("input", render);
+
+    // Toolbar buttons
+    document.getElementById("btnNew").addEventListener("click", () => {
+      const demos = [
+        { name: "sample-video-tutorial.mp4", sub: "cdn.faast.dev", category: "video", size: "340 MB" },
+        { name: "open-source-icons.zip", sub: "github.com/icons", category: "app", size: "24 MB" },
+        { name: "podcast-episode-42.mp3", sub: "feeds.simplecast.com", category: "music", size: "68 MB" },
+        { name: "research-paper-draft.pdf", sub: "arxiv.org", category: "document", size: "3.1 MB" },
+      ];
+      const pick = demos[Math.floor(Math.random() * demos.length)];
+      downloads.unshift({
+        id: Date.now(),
+        name: pick.name,
+        sub: pick.sub,
+        category: pick.category,
+        status: "downloading",
+        progress: 0,
+        size: pick.size,
+        speed: (Math.random() * 4 + 0.5).toFixed(1) + " MB/s",
+        eta: Math.floor(Math.random() * 20 + 5) + " min",
+      });
+      render();
+    });
+
+    document.getElementById("btnPause").addEventListener("click", () => {
+      const active = downloads.filter((d) => d.status === "downloading");
+      if (active.length) {
+        active.forEach((d) => {
+          d.status = "paused";
+          d.speed = "0 B/s";
+          d.eta = "Paused";
+        });
+        render();
+      }
+    });
+
+    document.getElementById("btnResume").addEventListener("click", () => {
+      const paused = downloads.filter((d) => d.status === "paused" || d.status === "stopped");
+      if (paused.length) {
+        paused.forEach((d) => {
+          d.status = "downloading";
+          d.speed = (Math.random() * 3 + 0.8).toFixed(1) + " MB/s";
+          d.eta = Math.floor(Math.random() * 15 + 3) + " min";
+        });
+        render();
+      }
+    });
+
+    document.getElementById("btnRemove").addEventListener("click", () => {
+      // Remove all completed as a demo bulk action
+      for (let i = downloads.length - 1; i >= 0; i--) {
+        if (downloads[i].status === "completed") downloads.splice(i, 1);
+      }
+      render();
+    });
+
+    // Simulate progress ticks
+    setInterval(() => {
+      let changed = false;
+      downloads.forEach((d) => {
+        if (d.status === "downloading" && d.progress < 100) {
+          d.progress = Math.min(100, d.progress + Math.floor(Math.random() * 3) + 1);
+          if (d.progress >= 100) {
+            d.status = "completed";
+            d.progress = 100;
+            d.speed = "—";
+            d.eta = "Done";
+          }
+          changed = true;
+        }
+      });
+      if (changed) render();
+    }, 2400);
+
+    // Initial render
+    render();
+  </script>
+</body>
+</html>

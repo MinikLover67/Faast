@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>faast — Download Manager</title>
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <div id="app">
+      <div class="window" role="application" aria-label="faast download manager">
+
+        <!-- Title bar -->
+        <div class="titlebar" data-tauri-drag-region="deep">
+          <div class="app-brand">
+            <span class="brand-mark" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M10 3h4v8h4L12 19 6 11h4z" /></svg>
+            </span>
+            <span class="brand-text">faast<span>.</span></span>
+          </div>
+          <div class="titlebar-spacer"></div>
+          <div class="titlebar-drag"></div>
+          <div class="titlebar-meta">Open Source · v0.1.0-alpha</div>
+          <div class="titlebar-left">
+            <button class="wbtn" id="tabLibrary" data-tab="library" aria-pressed="true" aria-label="Library view">Library</button>
+            <button class="wbtn" id="tabFiles" data-tab="files" aria-label="Files view">Files</button>
+          </div>
+          <button class="wbtn theme-toggle" id="btnThemeToggle" title="Toggle dark mode" aria-label="Toggle dark mode">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+          </button>
+          <div class="window-controls">
+            <button class="wbtn" data-action="minimize" title="Minimize" aria-label="Minimize">
+              <svg viewBox="0 0 10 10" aria-hidden="true"><line x1="0" y1="5" x2="10" y2="5" /></svg>
+            </button>
+            <button class="wbtn" data-action="maximize" title="Maximize" aria-label="Maximize">
+              <svg viewBox="0 0 10 10" aria-hidden="true" class="ic-max"><rect x="0.5" y="0.5" width="9" height="9" /></svg>
+              <svg viewBox="0 0 10 10" aria-hidden="true" class="ic-restore" hidden><rect x="0.5" y="2.5" width="7" height="7" /><polyline points="2.5,2.5 2.5,0.5 9.5,0.5 9.5,7.5 7.5,7.5" /></svg>
+            </button>
+            <button class="wbtn close" data-action="close" title="Close" aria-label="Close">
+              <svg viewBox="0 0 10 10" aria-hidden="true"><line x1="0" y1="0" x2="10" y2="10" /><line x1="10" y1="0" x2="0" y2="10" /></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Shell -->
+        <div class="shell">
+
+          <!-- Sidebar -->
+          <aside class="sidebar">
+            <div>
+              <div class="sidebar-section-label">Library</div>
+              <ul class="nav-list" id="navPrimary">
+                <li>
+                  <button class="nav-item active" data-filter="all">
+                    <span class="ico"><span data-icon="layout-list"></span></span> All downloads
+                    <span class="nav-badge" id="countAll">6</span>
+                  </button>
+                </li>
+                <li>
+                  <button class="nav-item" data-filter="downloading">
+                    <span class="ico"><span data-icon="download"></span></span> Downloading
+                    <span class="nav-badge" id="countDownloading">2</span>
+                  </button>
+                </li>
+                <li>
+                  <button class="nav-item" data-filter="completed">
+                    <span class="ico"><span data-icon="check-circle"></span></span> Completed
+                    <span class="nav-badge" id="countCompleted">3</span>
+                  </button>
+                </li>
+                <li>
+                  <button class="nav-item" data-filter="paused">
+                    <span class="ico"><span data-icon="pause"></span></span> Paused
+                    <span class="nav-badge" id="countPaused">1</span>
+                  </button>
+                </li>
+                <li>
+                  <button class="nav-item" data-filter="failed">
+                    <span class="ico"><span data-icon="x-circle"></span></span> Failed
+                    <span class="nav-badge" id="countFailed">0</span>
+                  </button>
+                </li>
+                <li>
+                  <button class="nav-item" data-view="files">
+                    <span class="ico"><span data-icon="folder"></span></span> Files
+                  </button>
+                </li>
+                <li>
+                  <button class="nav-item" id="btnFolders">
+                    <span class="ico"><span data-icon="folder-open"></span></span> Folders
+                  </button>
+                </li>
+              </ul>
+            </div>
+
+            <div>
+              <div class="sidebar-section-label">Categories</div>
+              <ul class="nav-list" id="navCategories">
+                <li>
+                  <button class="nav-item" data-category="video">
+                    <span class="ico"><span data-icon="film"></span></span> Video
+                  </button>
+                </li>
+                <li>
+                  <button class="nav-item" data-category="music">
+                    <span class="ico"><span data-icon="music"></span></span> Music
+                  </button>
+                </li>
+                <li>
+                  <button class="nav-item" data-category="document">
+                    <span class="ico"><span data-icon="file-text"></span></span> Documents
+                  </button>
+                </li>
+                <li>
+                  <button class="nav-item" data-category="app">
+                    <span class="ico"><span data-icon="app-window"></span></span> Applications
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </aside>
+
+          <!-- Main panel -->
+          <main class="main">
+
+            <!-- Toolbar -->
+            <div class="toolbar">
+              <button class="btn btn-primary" id="btnNew">
+                <span data-icon="plus"></span> New download
+              </button>
+              <button class="btn" id="btnPause">
+                <span data-icon="pause"></span> Pause
+              </button>
+              <button class="btn" id="btnResume">
+                <span data-icon="play"></span> Resume
+              </button>
+              <div class="toolbar-divider"></div>
+              <button class="btn btn-ghost" id="btnRemove">
+                <span data-icon="trash-2"></span> Remove
+              </button>
+              <div class="search-wrap">
+                <span class="search-icon" data-icon="search"></span>
+                <input type="text" id="searchInput" placeholder="Search" aria-label="Search downloads" />
+              </div>
+            </div>
+
+            <!-- Column headers -->
+            <div class="list-header">
+              <div>Name</div>
+              <div>Status</div>
+              <div>Progress</div>
+              <div>Size</div>
+              <div>Speed</div>
+              <div>ETA</div>
+              <div></div>
+            </div>
+
+            <!-- Download list -->
+            <div class="download-list" id="downloadList"></div>
+
+            <!-- Files view (clean file browser) -->
+            <div class="files-view" id="filesView" hidden>
+              <div class="files-toolbar">
+                <button class="btn" id="btnFilesBack" title="Back" hidden>← Back</button>
+                <span class="files-path" id="filesPath"></span>
+              </div>
+              <div class="files-list" id="filesList"></div>
+              <div class="files-empty" id="filesEmpty" hidden>
+                <div class="big" id="filesEmptyIcon"></div>
+                <p>No downloaded files yet.</p>
+              </div>
+            </div>
+
+            <!-- Status bar -->
+            <div class="statusbar">
+              <div class="status-item">
+                <span class="speed-indicator"><span class="pulse"></span> <span id="globalSpeed">0 B/s</span></span>
+              </div>
+              <div class="status-item">
+                <span>Active:</span> <strong id="activeCount">0</strong>
+              </div>
+              <div class="status-item">
+                <span>Total down:</span> <strong id="totalDownloaded">0 B</strong>
+              </div>
+              <div class="status-spacer"></div>
+              <div class="status-item">
+                <span>Limit:</span> <strong id="globalLimit">Unlimited</strong> KB/s
+              </div>
+              <div class="status-item">
+                <label for="limitKbps" title="Global speed limit in KB/s (0 = unlimited)">Limit (KB/s):</label>
+                <input type="number" id="limitKbps" min="0" step="1" placeholder="0" title="Global speed limit in KB/s (0 = unlimited)" />
+              </div>
+            </div>
+
+          </main>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add download modal -->
+    <div class="modal-backdrop" id="modalBackdrop" hidden>
+      <div class="modal" role="dialog" aria-label="New download">
+        <div class="modal-title">New download</div>
+        <div class="modal-input-row">
+          <input type="text" id="downloadUrl" placeholder="Link, magnet, or .torrent" aria-label="Download link" />
+          <button class="btn" id="btnModalBrowse">Browse…</button>
+        </div>
+        <div class="modal-save-row">
+          <span class="modal-save-label">Save to:</span>
+          <strong id="saveDirLabel">Downloads</strong>
+          <button class="btn-link" id="btnModalSaveDir" title="Choose save folder">Change…</button>
+        </div>
+        <div class="modal-save-row" id="formatRow" hidden>
+          <span class="modal-save-label">Format:</span>
+          <select id="mediaFormat" title="Choose the output format for video and audio links">
+            <optgroup label="Video">
+              <option value="best" selected>Best quality (MP4)</option>
+              <option value="1080p">1080p MP4</option>
+              <option value="720p">720p MP4</option>
+              <option value="480p">480p MP4</option>
+            </optgroup>
+            <optgroup label="Audio only">
+              <option value="mp3">MP3</option>
+              <option value="m4a">M4A</option>
+              <option value="wav">WAV (lossless)</option>
+              <option value="flac">FLAC (lossless)</option>
+              <option value="opus">Opus</option>
+            </optgroup>
+          </select>
+        </div>
+        <div class="modal-save-row">
+          <span class="modal-save-label">Start at:</span>
+          <input type="datetime-local" id="scheduleStart" title="Schedule this download to start at a specific time" />
+        </div>
+        <div class="modal-hint">Tip: drop a .torrent file anywhere in this window to add it.</div>
+        <div class="modal-actions">
+          <button class="btn" id="btnModalCancel">Cancel</button>
+          <button class="btn btn-primary" id="btnModalAdd">Add download</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Folder routing modal -->
+    <div class="modal-backdrop" id="routingBackdrop" hidden>
+      <div class="modal modal-wide" role="dialog" aria-label="Folder routing">
+        <div class="modal-title">Folder routing</div>
+        <p class="modal-hint">
+          Downloads go to a root folder. Rules send matching files into subfolders —
+          first match wins. Files with no match stay in the root.
+        </p>
+
+        <div class="modal-save-row">
+          <span class="modal-save-label">Root:</span>
+          <input type="text" id="routingRoot" placeholder="Documents\Faast-Downloads" spellcheck="false" aria-label="Root download folder" />
+          <button class="btn-link" id="btnRoutingRoot" title="Choose the root folder">Change…</button>
+        </div>
+
+        <div class="modal-save-row">
+          <label class="modal-save-label" for="routingEnabled">Routing enabled</label>
+          <input type="checkbox" id="routingEnabled" />
+        </div>
+
+        <div class="routing-rules" id="routingRules"></div>
+
+        <div class="modal-actions">
+          <button class="btn" id="btnRoutingAdd">Add rule</button>
+          <span class="status-spacer"></span>
+          <button class="btn" id="btnRoutingCancel">Cancel</button>
+          <button class="btn btn-primary" id="btnRoutingSave">Save</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast notifications -->
+    <div class="toast-wrap" id="toastWrap" aria-live="polite"></div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

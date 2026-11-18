@@ -1,0 +1,18 @@
+PackageIdentifier: Minik.Faast
+PackageVersion: 0.1.0
+PackageLocale: en-US
+Publisher: Faast contributors
+PublisherUrl: https://github.com/<OWNER>/faast
+PackageName: Faast
+PackageUrl: https://github.com/<OWNER>/faast
+License: MIT
+ShortDescription: Local-first download manager with segmented HTTP and torrents
+Description: Faast is a free, open-source Windows download manager. It downloads HTTP files over parallel Range connections with crash-safe resume, supports magnets and torrents, and routes video and audio links through yt-dlp.
+Moniker: faast
+Tags:
+  - download-manager
+  - torrent
+  - open-source
+  - windows
+ManifestType: defaultLocale
+ManifestVersion: 1.10.0

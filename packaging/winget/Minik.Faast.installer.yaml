@@ -1,0 +1,24 @@
+PackageIdentifier: Minik.Faast
+PackageVersion: 0.1.0
+Platform:
+  - Windows.Desktop
+MinimumOSVersion: 10.0.17763.0
+InstallerType: nullsoft
+InstallModes:
+  - interactive
+  - silent
+  - silentWithProgress
+NestedInstallerType: nullsoft
+InstallerSwitches:
+  Silent: /S
+  SilentWithProgress: /S
+  Custom: /D=
+UpgradeBehavior: install
+ProtectedCapabilities:
+  - AllowElevation
+Installers:
+  - Architecture: x64
+    InstallerUrl: https://github.com/<OWNER>/faast/releases/download/v0.1.0/Faast_0.1.0_x64-setup.exe
+    InstallerSha256: <SHA256_OF_SETUP_EXE>
+ManifestType: installer
+ManifestVersion: 1.10.0

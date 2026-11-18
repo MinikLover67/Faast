@@ -1,0 +1,44 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "build": {
+    "beforeDevCommand": "vite dev",
+    "beforeBuildCommand": "vite build",
+    "devUrl": "http://localhost:1420",
+    "frontendDist": "../dist"
+  },
+  "productName": "Faast",
+  "version": "0.1.0",
+  "identifier": "com.faast.app",
+  "app": {
+    "windows": [
+      {
+        "title": "Faast — Download Manager",
+        "width": 1180,
+        "height": 740,
+        "minWidth": 860,
+        "minHeight": 520,
+        "resizable": true,
+        "visible": true,
+        "center": true,
+        "decorations": false,
+        "fullscreen": false,
+        "maximized": false
+      }
+    ],
+    "security": {
+      "csp": null,
+      "capabilities": ["default"]
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/icon.png",
+      "icons/icon.ico",
+      "icons/icon.icns"
+    ]
+  }
+}

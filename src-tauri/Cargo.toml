@@ -1,0 +1,32 @@
+[package]
+name = "faast"
+version = "0.1.0"
+description = "Faast - Open source, free, local download manager for Windows."
+authors = ["Faast"]
+edition = "2021"
+
+[lib]
+name = "faast_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+tauri-plugin-dialog = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+reqwest = { version = "0.12", features = ["json", "stream"] }
+futures-util = "0.3"
+tokio = { version = "1", features = ["rt", "macros", "time", "fs", "io-util", "sync", "process"] }
+librqbit = { version = "9.1.0", default-features = false, features = ["rust-tls"] }
+
+[target.'cfg(windows)'.dependencies]
+windows-sys = { version = "0.61", features = ["Win32_System_DataExchange", "Win32_System_Memory"] }
+
+[dev-dependencies]
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+[profile.dev]
+debug = 0

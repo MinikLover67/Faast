@@ -1,0 +1,18 @@
+{
+  "version": "0.1.0",
+  "homepage": "https://github.com/<OWNER>/faast",
+  "description": "Local-first Windows download manager with segmented HTTP, torrents and crash-safe resume",
+  "license": "MIT",
+  "architecture": {
+    "64bit": {
+      "url": "https://github.com/<OWNER>/faast/releases/download/v0.1.0/Faast_0.1.0_x64-setup.exe",
+      "hash": "<SHA256_OF_SETUP_EXE>"
+    }
+  },
+  "installer": {
+    "exe": "Faast_0.1.0_x64-setup.exe",
+    "args": ["/S", "/D=$dir"]
+  },
+  "shortcuts": ["Faast.lnk"],
+  "notes": ["Faast is early alpha and Windows-only. Run 'faast' or use the desktop shortcut."]
+}
