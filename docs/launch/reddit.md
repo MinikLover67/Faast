@@ -11,7 +11,7 @@ I've been working on Faast, a free Windows download manager, because the ones I 
 
 It uses parallel Range connections for HTTP files, writes each part to disk, and resumes from the parts after a crash. Torrents and yt-dlp links work too. No account, no ads, no telemetry.
 
-It's v0.1, Windows-only, no browser extension yet. Repo and screenshots: <url>. What reliability issue annoys you most about current managers?
+It's v0.1, Windows-only, no browser extension yet. Repo and screenshots: https://github.com/MinikLover67/Faast. What reliability issue annoys you most about current managers?
 
 ## r/Windows11
 

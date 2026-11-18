@@ -1,11 +1,11 @@
 {
   "version": "0.1.0",
-  "homepage": "https://github.com/<OWNER>/faast",
+  "homepage": "https://github.com/MinikLover67/Faast",
   "description": "Local-first Windows download manager with segmented HTTP, torrents and crash-safe resume",
   "license": "MIT",
   "architecture": {
     "64bit": {
-      "url": "https://github.com/<OWNER>/faast/releases/download/v0.1.0/Faast_0.1.0_x64-setup.exe",
+      "url": "https://github.com/MinikLover67/Faast/releases/download/v0.1.0/Faast_0.1.0_x64-setup.exe",
       "hash": "<SHA256_OF_SETUP_EXE>"
     }
   },

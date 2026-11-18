@@ -19,7 +19,7 @@ It is an independent implementation inspired by [Free Download Manager](https://
 
 ## Quick start
 
-**Install (Windows 10/11, x64):** download `Faast_0.1.0_x64-setup.exe` (NSIS) or the MSI from the [Releases](https://github.com/faast/faast/releases) page and run it. The repo URL in this README is a placeholder until the project goes public.
+**Install (Windows 10/11, x64):** download `Faast_0.1.0_x64-setup.exe` (NSIS) or the MSI from the [Releases](https://github.com/MinikLover67/Faast/releases) page and run it.
 
 ```powershell
 # from source

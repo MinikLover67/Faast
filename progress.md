@@ -125,3 +125,13 @@
 ## Rollback
 - No git available. Original (seamed) icons kept at `src-tauri/icons.bak`.
 - `scripts/fix-icons.mjs` is idempotent and can be re-run any time.
+
+## Public-readiness pass (2026-11-17)
+- Wrote public README (reliability wedge, honest limitations), docs/BENCHMARKS.md, POSITIONING.md, INSTALL.md, CLI-DESIGN.md, TESTING.md.
+- Added docs/launch/ drafts (show-hn, reddit, product-hunt) + packaging (scoop/winget manifests) + scripts/sign-installer.ps1.
+- Exposed http_segment_count/split_ranges/download_segment as pub; added src-tauri/tests/benchmark.rs.
+- Results: 1c=121MB/s, 8c=495MB/s, 16c=553MB/s, 32c=491MB/s (128MiB loopback, 4.6x max).
+- Captured 3 UI frames (scripts/gif/*.png), encoded docs/assets/faast-demo.gif (3 frames, 1280x800) via gif-encoder-2 (devDep).
+- Removed broken scripts/make-demo-gif.ps1; kept verify-gif.ps1. README embeds demo gif + static shot; fixed placeholder repo link.
+- Verified: vite build clean, 52/52 unit, engine_live ok, cargo check --all-targets clean.
+- git init'd repo, committed 8305c20 'v0.1.0: reliability-first download manager'. NOT yet pushed (needs public remote/URL).
