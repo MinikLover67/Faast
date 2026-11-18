@@ -1,0 +1,18 @@
+# Global owners
+* @MinikLover67
+
+# Backend (Rust)
+/src-tauri/ @MinikLover67
+
+# Frontend (JS/CSS)
+/src/ @MinikLover67
+/index.html @MinikLover67
+/vite.config.ts @MinikLover67
+
+# Docs
+/docs/ @MinikLover67
+/README.md @MinikLover67
+
+# CI / Release
+/.github/workflows/ @MinikLover67
+/scripts/sign-installer.ps1 @MinikLover67

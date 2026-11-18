@@ -135,3 +135,10 @@
 - Removed broken scripts/make-demo-gif.ps1; kept verify-gif.ps1. README embeds demo gif + static shot; fixed placeholder repo link.
 - Verified: vite build clean, 52/52 unit, engine_live ok, cargo check --all-targets clean.
 - git init'd repo, committed 8305c20 'v0.1.0: reliability-first download manager'. NOT yet pushed (needs public remote/URL).
+
+## Push to GitHub (2026-11-17)
+- Added remote: https://github.com/MinikLover67/Faast.git
+- Merged unrelated histories (remote had Initial commit only), kept local LICENSE/README.md
+- Pushed main branch to 0ea34ab
+- All placeholder URLs now point to MinikLover67/Faast
+- Next: create Release v0.1.0 with signed installer + assets, then update manifests with real SHA256.

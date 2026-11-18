@@ -1,5 +1,18 @@
 # Faast
 
+<p align="center">
+  <img src="docs/assets/faast-logo.png" alt="Faast logo" width="128" height="128" />
+</p>
+
+<p align="center">
+  <a href="https://github.com/MinikLover67/Faast/actions/workflows/ci.yml"><img alt="CI" src="https://img.shields.io/github/actions/workflow/status/MinikLover67/Faast/ci.yml?branch=main&label=CI"/></a>
+  <a href="https://github.com/MinikLover67/Faast/releases/latest"><img alt="Release" src="https://img.shields.io/github/v/release/MinikLover67/Faast?label=release"/></a>
+  <a href="LICENSE"><img alt="License" src="https://img.shields.io/github/license/MinikLover67/Faast"/></a>
+  <a href="https://github.com/MinikLover67/Faast/blob/main/CHANGELOG.md"><img alt="Changelog" src="https://img.shields.io/badge/changelog-keep%20a%20changelog-%232563eb"/></a>
+  <img alt="Platform" src="https://img.shields.io/badge/platform-Windows%2010%2F11-%232563eb"/>
+  <img alt="Arch" src="https://img.shields.io/badge/arch-x64-%232563eb"/>
+</p>
+
 **A free, open-source download manager for Windows that keeps working when the link gets difficult.**
 
 Faast is a local-first desktop app: segmented HTTP downloads, full BitTorrent support, and yt-dlp routing in one small native window. No account, no ads, no telemetry, no browser extension that can silently disconnect.
@@ -23,7 +36,7 @@ It is an independent implementation inspired by [Free Download Manager](https://
 
 ```powershell
 # from source
-git clone <your-repo-url> faast
+git clone https://github.com/MinikLover67/Faast.git faast
 cd faast
 npm install
 npm run tauri build

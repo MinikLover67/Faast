@@ -1,5 +1,6 @@
 :root {
   /* Light theme: FDM-inspired. Dark theme: shadcn's neutral zinc scale. */
+  --brand: #2563eb;
   --navy: #102232;
   --navy-2: #1a3853;
   --navy-3: #0b1b28;
@@ -32,6 +33,7 @@
 
 /* â”€â”€ Dark theme â€” shadcn zinc â”€â”€ */
 [data-theme="dark"] {
+  --brand: #3b82f6;
   --navy: #18181b;
   --navy-2: #27272a;
   --navy-3: #09090b;

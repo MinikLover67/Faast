@@ -1,0 +1,67 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  rust:
+    name: Rust (unit + engine_live)
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: src-tauri
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+      - name: Unit tests
+        run: cargo test --lib
+      - name: Engine live test
+        run: cargo test --test engine_live
+      - name: Check (all targets)
+        run: cargo check --all-targets
+      - name: Clippy
+        run: cargo clippy --all-targets -- -D warnings
+      - name: Fmt
+        run: cargo fmt --all -- --check
+
+  frontend:
+    name: Frontend (build + lint)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      # No JS linter configured yet; add eslint/prettier if desired
+
+  # E2E needs a display server; run locally for now
+  # e2e:
+  #   name: E2E (Playwright)
+  #   runs-on: windows-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: actions/setup-node@v4
+  #       with:
+  #         node-version: 20
+  #         cache: npm
+  #     - run: npm ci
+  #     - run: npm run build
+  #     - run: npx playwright install --with-deps chromium
+  #     - run: npm run preview &
+  #       env:
+  #         CI: true
+  #     - run: npm run e2e

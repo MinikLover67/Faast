@@ -1,0 +1,44 @@
+name: Feature request
+description: Suggest an idea
+title: "[Feature] "
+labels: ["feature", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the idea! Before submitting:
+        - Check `docs/POSITIONING.md` — our wedge is **reliability**, not feature parity with AB DM
+        - Browser extension, cross-platform, and per-torrent priorities are explicitly deferred
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve?
+      placeholder: |
+        When a large HTTP download fails at 90%, there's no way to see *why* — the row just says "Failed" with no HTTP status or server message.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      placeholder: |
+        Show the last HTTP status code + response body snippet in the error tooltip. Add a "Copy error" button.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      placeholder: |
+        Could also log to a file, but in-row is faster for quick diagnosis.
+    validations:
+      required: false
+  - type: checkboxes
+    id: scope
+    attributes:
+      label: Scope check
+      options:
+        - label: This aligns with the reliability wedge (crash-safe resume, honest errors, no silent failures)
+          required: true
+        - label: This is NOT a browser extension / cross-platform / parity feature
+          required: true
