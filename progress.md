@@ -142,3 +142,13 @@
 - Pushed main branch to 0ea34ab
 - All placeholder URLs now point to MinikLover67/Faast
 - Next: create Release v0.1.0 with signed installer + assets, then update manifests with real SHA256.
+
+## GitHub repo hardening + brand (2026-11-17)
+- Logo analysis: dominant #2060e0 -> static brand --brand: #2563eb (light) / #3b82f6 (dark)
+- Added --brand to :root and [data-theme=dark] in src/style.css
+- Copied logo to docs/assets/faast-logo.png; embedded in README with centered markup
+- GitHub repo scaffolding: .github/workflows/ci.yml (Rust unit+engine_live, frontend build), issue templates (bug/feature), PR template, CONTRIBUTING.md, SECURITY.md, CODEOWNERS, FUNDING.yml
+- CHANGELOG.md (Keep a Changelog format) + README badges (CI, release, license, changelog, platform, arch) + fixed git clone URL
+- Verified: 
+pm run build clean
+- Pushed main to 3d722ab

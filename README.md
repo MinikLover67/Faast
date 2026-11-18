@@ -5,8 +5,6 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/MinikLover67/Faast/actions/workflows/ci.yml"><img alt="CI" src="https://img.shields.io/github/actions/workflow/status/MinikLover67/Faast/ci.yml?branch=main&label=CI"/></a>
-  <a href="https://github.com/MinikLover67/Faast/releases/latest"><img alt="Release" src="https://img.shields.io/github/v/release/MinikLover67/Faast?label=release"/></a>
   <a href="LICENSE"><img alt="License" src="https://img.shields.io/github/license/MinikLover67/Faast"/></a>
   <a href="https://github.com/MinikLover67/Faast/blob/main/CHANGELOG.md"><img alt="Changelog" src="https://img.shields.io/badge/changelog-keep%20a%20changelog-%232563eb"/></a>
   <img alt="Platform" src="https://img.shields.io/badge/platform-Windows%2010%2F11-%232563eb"/>

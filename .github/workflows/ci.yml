@@ -22,8 +22,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
-      - name: Cache cargo
-        uses: Swatinem/rust-cache@v2
+        with:
+          components: [clippy, rustfmt]
+      # Skip Swatinem/rust-cache to avoid permission issues on fresh repos
       - name: Unit tests
         run: cargo test --lib
       - name: Engine live test
@@ -36,7 +37,7 @@ jobs:
         run: cargo fmt --all -- --check
 
   frontend:
-    name: Frontend (build + lint)
+    name: Frontend (build)
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -44,6 +45,7 @@ jobs:
         with:
           node-version: 20
           cache: npm
+          cache-dependency-path: package-lock.json
       - run: npm ci
       - run: npm run build
       # No JS linter configured yet; add eslint/prettier if desired
